@@ -1,0 +1,22 @@
+{
+  "release": {
+    "name": "Production release file",
+    "version": "1.0.0",
+    "infrastructure_version": "1.0.0",
+    "automation_version": "master",
+    "services": {
+      "intapi": {
+        "version": "1.0.0",
+        "configuration": "1.0.0"
+      },
+      "intweb": {
+        "version": "1.0.0",
+        "configuration": "1.0.0"
+      },
+      "intdb": {
+        "version": "1.0.0",
+        "configuration": "1.0.0"
+      }
+    }
+  }
+}
