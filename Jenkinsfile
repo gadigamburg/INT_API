@@ -17,20 +17,17 @@ pipeline {
     options {
         timeout(time: 30, unit: 'MINUTES')
     }
-    agent { label 'master' }
+    agent { label 'slave' }
     stages {
          stage('Checkout') {
              steps {
                  script {
-                     node('master'){
-                         dir('Release') {
-                             deleteDir()
-                             checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
-                             path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
-                             Current_version = Return_Json_From_File("$path_json_file").release.services.intapi.version
-                         }
+                     dir('Release') {
+                         deleteDir()
+                         checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
+                         path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
+                         Current_version = Return_Json_From_File("$path_json_file").release.services.intapi.version
                      }
-                     
                      dir('INT_API') {
                          deleteDir()
                          checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/INT_API.git"]]])
@@ -45,7 +42,7 @@ pipeline {
          }
          stage('UT') {
              steps {
-                 println('UT will be added soon')
+                 println('UT will be added soon GADI')
              }
          }
          stage('Build') {
