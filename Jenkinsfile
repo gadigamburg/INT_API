@@ -1,92 +1,97 @@
-  
+//@Library('Utilities') _
+import groovy.json.JsonSlurper
+import hudson.model.*
 def BuildVersion
+def Current_version
+def NextVersion
+def dev_rep_docker = 'devopsint/dev'
+def colons = ':'
+def module = 'intapi'
+def underscore = '_'
 
- pipeline {
-   options {
-      timeout(time: 30, unit: 'MINUTES')def BuildVersion
+def Return_Json_From_File(file_name){
+    return new JsonSlurper().parse(new File(file_name))
+}
 
-   }
-  environment {
-    registry = "dockerhubuser/repo"
-    registryCredential = 'dockerhub'
-    dockerImage = ''
-  }
-    agent {
-        label 'master'
+pipeline {
+    options {
+        timeout(time: 30, unit: 'MINUTES')
     }
+    agent { label 'master' }
     stages {
-        stage ('Checkout') {
-            steps {
-                script {
-                    deleteDir()
-                    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/DevOpsINT/Course.git']]])def BuildVersion
+         stage('Checkout') {
+             steps {
+                 script {
+                     node('master'){
+                         dir('Release') {
+                             deleteDir()
+                             checkout([$class: 'GitSCM', branches: [[name: 'Gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
+                             path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
+                             Current_version = Return_Json_From_File("$path_json_file").release.services.intapi.version
+                         }
+                     }
+                     
+                     dir('INT_API') {
+                         deleteDir()
+                         checkout([$class: 'GitSCM', branches: [[name: 'Gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/INT_API.git"]]])
+                         Commit_Id = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                         BuildVersion = Current_version + '_' + Commit_Id
+                         last_digit_current_version = sh(script: "echo $Current_version | cut -d'.' -f3", returnStdout: true).trim()
+                         NextVersion = sh(script: "echo $Current_version | cut -d. -f1", returnStdout: true).trim() + '.' + sh(script: "echo $Current_version |cut -d'.' -f2", returnStdout: true).trim() + '.' + (Integer.parseInt(last_digit_current_version) + 1)
+                         println("Checking the build version: $BuildVersion")
+                     }
+                 }
+             }
+         }
+         stage('UT') {
+             steps {
+                 println('UT will be added soon')
+             }
+         }
+         stage('Build') {
+             steps {
+                 script {
+                     dir('INT_API') {
+                         try {
 
-            			       		CurrentGitVersion = sh script:"git tag | sort -r | head -1", returnStdout: true
-                        CurrentGitVersion = CurrentGitVersion.trim()
-                        echo("CurrentGitVersion Is: ${CurrentGitVersion}")
-                        CurrentCommitIdShort = sh script:"git rev-parse HEAD | cut -c1-10", returnStdout: true
-                        echo("CurrentCommitIdShort Is: ${CurrentCommitIdShort}")
-                        BuildVersion = "${CurrentGitVersion}_${CurrentCommitIdShort}"
-                        BuildVersion = BuildVersion.trim()
-                        echo("BuildVersion Is: ${BuildVersion}")
+                           docker.build("$module$colons$BuildVersion")
+                           println("The build image is successfully")  
 
-                }
-            }
-        }
-        stage ('Unit Test') {
-            steps {
-                script {
-                    dir ('./testDevdir/') {
-                        try {
-                            sh ''
-                            sh ''
-                            echo("..")
-                        } catch (err) {
-                            println("...")
-                            currentBuild.result = 'UNSTABLE'
-                        }
-                      sh 'pwd'
-                      sh 'ls'
-                    }
-                }
-            }
-        }
-
-           stage ('build') {
-            steps {
-                script {
-                        try {
-                            sh ''
-                            sh ''
-                            echo("..")
-                        } catch (err) {
-                            println("...")
-                            currentBuild.result = 'UNSTABLE'
-                        }
-                //  sh 'pwd'
-                //  sh 'ls'
-                    
-                }
-            }
-        }
-
-                  stage ('sanity_test') {
-            steps {
-                script {
-                        try {
-                            sh ''
-                            sh ''
-                            echo("..")
-                        } catch (err) {
-                            println("...")
-                            currentBuild.result = 'UNSTABLE'
-                        }
-                   //   sh 'pwd'
-                  //  sh 'ls'
-                    
-                }
-            }
-        }
-        
+                         }
+                         catch (exception) {
+                             println "The image build is failed"
+                             currentBuild.result = 'FAILURE'
+                             throw exception
+                         }
+                     }
+                 }
+             }
+         }
+         stage('Push image to repository'){
+             steps{
+                 script{
+                     try{
+                         withCredentials([usernamePassword(credentialsId: 'docker-cred-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                                sh "docker login -u=${DOCKER_USERNAME} -p=${DOCKER_PASSWORD}"
+                                sh "docker tag $module$colons$BuildVersion $dev_rep_docker$colons$module$underscore$BuildVersion"
+                                sh "docker push $dev_rep_docker$colons$module$underscore$BuildVersion"
+                                
+                         }
+                         }
+                     catch (exception){
+                         println "The image pushing to dockehub  failed"
+                         currentBuild.result = 'FAILURE'
+                         throw exception
+                     }
+                 }
+             }
+         }
+         stage('Push tag version to repository'){
+             steps{
+                 script{
+                    println('Tag version will be added soon')
+                 }
+             }
+         }
     }
 }
