@@ -71,14 +71,15 @@ pipeline {
                  script{
                      try{
                          withCredentials([usernamePassword(credentialsId: 'docker_hub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                                sh "docker login -u=${DOCKER_USERNAME} -p=${DOCKER_PASSWORD}"
-                                sh "docker tag $module$colons$BuildVersion $dev_rep_docker$colons$module$underscore$BuildVersion"
-                                sh "docker push $dev_rep_docker$colons$module$underscore$BuildVersion"
-                                
+                            println("DockerUser: ${DOCKER_USERNAME}")
+                            println("DockerPass: ${DOCKER_PASSWORD}")
+                            sh "docker login -u=${DOCKER_USERNAME} -p=${DOCKER_PASSWORD}"
+                            sh "docker tag $module$colons$BuildVersion $dev_rep_docker$colons$module$underscore$BuildVersion"
+                            sh "docker push $dev_rep_docker$colons$module$underscore$BuildVersion"
                          }
-                         }
+                     }
                      catch (exception){
-                         println "The image pushing to dockehub  failed"
+                         println "Pushing image to DockerHub failed"
                          currentBuild.result = 'FAILURE'
                          throw exception
                      }
