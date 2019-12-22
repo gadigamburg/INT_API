@@ -18,14 +18,16 @@ pipeline {
          stage('Checkout') {
              steps {
                  script {
-                     dir('Release') {
-                         deleteDir()
-                         checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
-                         println("Test")
-                         path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
-                         println("path_json_file: $path_json_file")
-                         Current_version = Return_Json_From_File("$path_json_file").release.services.intapi.version
-                         println("Current_version: $Current_version")
+                     node('master'){
+                         dir('Release') {
+                             deleteDir()
+                             checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
+                             println("Test")
+                             path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
+                             println("path_json_file: $path_json_file")
+                             Current_version = Return_Json_From_File("$path_json_file").release.services.intapi.version
+                             println("Current_version: $Current_version")
+                         }
                      }
                      dir('INT_API') {
                          deleteDir()
