@@ -9,10 +9,6 @@ def colons = ':'
 def module = 'intapi'
 def underscore = '_'
 
-def Return_Json_From_File(file_name){
-    return new JsonSlurper().parse(new File(file_name))
-}
-
 pipeline {
     options {
         timeout(time: 30, unit: 'MINUTES')
@@ -27,7 +23,7 @@ pipeline {
                          checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
                          println("Test")
                          path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
-                         println("path_json_file $path_json_file")
+                         println("path_json_file: $path_json_file")
                          Current_version = Return_Json_From_File("$path_json_file").release.services.intapi.version
                          println("Current_version: $Current_version")
                      }
@@ -95,4 +91,7 @@ pipeline {
              }
          }
     }
+}
+def Return_Json_From_File(file_name){
+    return new JsonSlurper().parse(new File(file_name))
 }
