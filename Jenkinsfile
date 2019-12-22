@@ -27,13 +27,14 @@ pipeline {
                          checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
                          path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
                          Current_version = Return_Json_From_File("$path_json_file").release.services.intapi.version
+                         println("Current_version: $Current_version")
                      }
                      dir('INT_API') {
                          deleteDir()
                          checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/INT_API.git"]]])
                          Commit_Id = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                          BuildVersion = Current_version + '_' + Commit_Id
-                         println("BuildVersion $BuildVersion")
+                         println("BuildVersion: $BuildVersion")
                          last_digit_current_version = sh(script: "echo $Current_version | cut -d'.' -f3", returnStdout: true).trim()
                          NextVersion = sh(script: "echo $Current_version | cut -d. -f1", returnStdout: true).trim() + '.' + sh(script: "echo $Current_version |cut -d'.' -f2", returnStdout: true).trim() + '.' + (Integer.parseInt(last_digit_current_version) + 1)
                          println("Checking the build version: $BuildVersion")
