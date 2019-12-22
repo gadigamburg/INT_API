@@ -25,6 +25,7 @@ pipeline {
                      dir('Release') {
                          deleteDir()
                          checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
+                         println("Test")
                          path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
                          Current_version = Return_Json_From_File("$path_json_file").release.services.intapi.version
                          println("Current_version: $Current_version")
