@@ -4,7 +4,7 @@ import hudson.model.*
 def BuildVersion
 def Current_version
 def NextVersion
-def dev_rep_docker = 'devopsint/dev'
+def dev_rep_docker = 'finalproject'
 def colons = ':'
 def module = 'intapi'
 def underscore = '_'
