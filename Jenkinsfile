@@ -92,13 +92,14 @@ pipeline {
                      node('master'){
                          dir('Release') {
                              withCredentials([usernamePassword(credentialsId: 'INT_API', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
-                             sh "git checkout gadi"
-                             sh "sed -i 's/${Current_version}/${NextVersion}/g ${path_json_file}'"
-                             sh "git config --global user.email 'gadi@gadi.com'"
-                             sh "git config --global user.name 'Jenkins'"
-                             sh "git add ${path_json_file}"
-                             sh "git commit -m 'CI approved ${NextVersion}'"
-                             sh "git push https://${GIT_USER}:${GIT_PASS}@github.com/gadigamburg/Release.git"
+                                 sh "git checkout gadi"
+                                 sh "sed -i 's/${Current_version}/${NextVersion}/g ${path_json_file}'"
+                                 sh "git config --global user.email 'gadi@gadi.com'"
+                                 sh "git config --global user.name 'Jenkins'"
+                                 sh "git add ${path_json_file}"
+                                 sh "git commit -m 'CI approved ${NextVersion}'"
+                                 sh "git push https://${GIT_USER}:${GIT_PASS}@github.com/gadigamburg/Release.git"
+                             }
                          }
                      }
                  }
