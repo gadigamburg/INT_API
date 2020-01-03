@@ -37,7 +37,8 @@ pipeline {
                          println("BuildVersion: $BuildVersion")
                          last_digit_current_version = sh(script: "echo $Current_version | cut -d'.' -f2", returnStdout: true).trim()
                          NextVersion = sh(script: "echo $Current_version | cut -d. -f1", returnStdout: true).trim() + '.' + sh(script: "echo $Current_version |cut -d'.' -f2", returnStdout: true).trim() + '.' + (Integer.parseInt(last_digit_current_version) + 1)
-                         println("Checking the build version: $BuildVersion")
+                         println("Current the build version: $BuildVersion")
+                         println("Next build version: $NextVersion")
                      }
                  }
              }
