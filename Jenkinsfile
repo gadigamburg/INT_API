@@ -36,6 +36,7 @@ pipeline {
                          BuildVersion = Current_version + '_' + Commit_Id
                          println("BuildVersion: $BuildVersion")
                          last_digit_current_version = sh(script: "echo $Current_version | cut -d'.' -f1", returnStdout: true).trim()
+                         println("Current last_digit_current_version: $last_digit_current_version")
                          NextVersion = sh(script: "echo $Current_version | cut -d. -f1", returnStdout: true).trim() + '.' + sh(script: "echo $Current_version |cut -d'.' -f2", returnStdout: true).trim() + '.' + (Integer.parseInt(last_digit_current_version) + 1)
                          println("Current the build version: $BuildVersion")
                          println("Next build version: $NextVersion")
@@ -94,7 +95,7 @@ pipeline {
                          dir('Release') {
                              withCredentials([usernamePassword(credentialsId: 'INT_API', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
                                  sh "git checkout gadi"
-                                 sh "sed -i 's/${Current_version}/${NextVersion}/' release.json"
+                                 sh "sed -i 's/${Current_version}/${BuildVersion}/' release.json"
                                  sh "git config --global user.email 'gadi@gadi.com'"
                                  sh "git config --global user.name 'Jenkins'"
                                  sh "git add ${path_json_file}"
