@@ -21,7 +21,7 @@ pipeline {
                      node('master'){
                          dir('Release') {
                              deleteDir()
-                             checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/Release.git"]]])
+                             checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'GadiGamburg_GIT', url: "https://github.com/gadigamburg/Release.git"]]])
                              println("Test")
                              path_json_file = sh(script: "pwd", returnStdout: true).trim() + '/' + 'release' + '.json'
                              println("path_json_file: $path_json_file")
@@ -31,7 +31,7 @@ pipeline {
                      }
                      dir('INT_API-CI') {
                          deleteDir()
-                         checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'INT_API', url: "https://github.com/gadigamburg/INT_API.git"]]])
+                         checkout([$class: 'GitSCM', branches: [[name: 'gadi']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'GadiGamburg_GIT', url: "https://github.com/gadigamburg/INT_API.git"]]])
                          Commit_Id = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                          BuildVersion = Current_version + '_' + Commit_Id
                          println("BuildVersion: $BuildVersion")
@@ -93,7 +93,7 @@ pipeline {
                  script{
                      node('master'){
                          dir('Release') {
-                             withCredentials([usernamePassword(credentialsId: 'INT_API', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
+                             withCredentials([usernamePassword(credentialsId: 'GadiGamburg_GIT', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
                                  sh "git checkout gadi"
                                  sh "sed -i 's/${Current_version}/${BuildVersion}/' release.json"
                                  sh "git config --global user.email 'gadi@gadi.com'"
