@@ -35,7 +35,7 @@ pipeline {
                          Commit_Id = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                          BuildVersion = Current_version + '_' + Commit_Id
                          println("BuildVersion: $BuildVersion")
-                         //last_digit_current_version = sh(script: "echo $Current_version | cut -d'.' -f3", returnStdout: true).trim()
+                         last_digit_current_version = sh(script: "echo $Current_version | cut -d'.' -f3", returnStdout: true).trim()
                          NextVersion = sh(script: "echo $Current_version | cut -d. -f1", returnStdout: true).trim() + '.' + sh(script: "echo $Current_version |cut -d'.' -f2", returnStdout: true).trim() + '.' + 1)
                          println("Checking the build version: $BuildVersion")
                      }
